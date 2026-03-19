@@ -1063,7 +1063,7 @@ function getInitData(card) {
 
 // ─── Photo sources helper — supports photo as string OR {key:filename} object ─
 function getPhotoSrcs(card) {
-  const base = card.sub ? `./${card.category}/${card.sub.toLowerCase()}` : `./${card.category}`;
+  const base = card.sub ? `./${card.category}/${card.sub}` : `./${card.category}`;
   if (typeof card.photo === 'string') {
     return card.photo ? [`${base}/${card.photo}.png`] : [];
   } else if (card.photo && typeof card.photo === 'object') {
