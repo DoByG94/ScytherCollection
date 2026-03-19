@@ -1984,8 +1984,11 @@ function App() {
         @media(max-width:1251px){
           .filter-extra-group{flex-basis:100%;justify-content:center;}
         }
-        @media(hover:none){.photo-nav{opacity:1!important;}}
-        @media(max-width:1020px){.stat-pills{flex-direction:column!important;gap:0.35rem!important;}}
+        @media(pointer:coarse){.photo-nav{opacity:1!important;}}
+        @media(max-width:1020px){
+          .stat-pills{flex-direction:column!important;gap:0.35rem!important;}
+          .header-center{column-gap:1rem!important;}
+        }
       `}</style>
 
       {/* ── HEADER — scrolls away ── */}
