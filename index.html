@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <meta name="viewport" content="width=932">
   <title>Scyther Collection Checklist</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
@@ -15,6 +15,7 @@
       background: #fafafa;
       color: #0f172a;
       min-height: 100vh;
+      min-width: 932px;
     }
     @keyframes photoSlideInRight {
       from { transform: translateX(40%); opacity: 0; }
@@ -1963,8 +1964,8 @@ function App() {
         @media(min-width:640px){
           .header-center{padding-right:6rem;}
         }
-        /* Merge 2 tab rows into one scrollable row at 5-card-per-row breakpoint */
-        @media(min-width:1000px){
+        /* Merge 2 tab rows into one scrollable row at wide screens */
+        @media(min-width:1830px){
           .tabs-outer{flex-direction:row!important;overflow-x:auto;padding:6px 1.75rem 0;justify-content:center;}
           .tabs-inner{display:contents!important;}
         }
@@ -1978,6 +1979,7 @@ function App() {
           .tabs-inner{padding:4px 0.4rem 0!important;}
           .main-pad{padding:0.75rem!important;}
         }
+        .tabs-inner{overflow-x:hidden!important;}
         .filter-extra-group{display:flex;align-items:center;gap:0.55rem;}
         @media(max-width:1251px){
           .filter-extra-group{flex-basis:100%;justify-content:center;}
