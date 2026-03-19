@@ -1,4 +1,4 @@
-﻿<!DOCTYPE html>
+﻿﻿<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -1889,7 +1889,7 @@ function App() {
 
   const stats = useMemo(()=>{
     const total=categoryFilteredBase.length;
-    const ownedCount=categoryFilteredBase.filter(c=>(cardDataMap[c._id]?.owned ?? c.Owned)).length;
+    const ownedCount=categoryFilteredBase.filter(c=>(cardDataMap[c._id]?.owned ?? c.Owned) && (cardDataMap[c._id]?.condition ?? c.Condition)!=="Ordered").length;
     const orderedCount=categoryFilteredBase.filter(c=>(cardDataMap[c._id]?.condition ?? c.Condition)==="Ordered").length;
     const ownedValue=categoryFilteredBase.reduce((s,c)=>{
       if(!(cardDataMap[c._id]?.owned ?? c.Owned))return s;
@@ -1954,40 +1954,101 @@ function App() {
         .chip:hover{opacity:0.75;}
         .card-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(155px,1fr));gap:14px;}
         @media(min-width:640px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(175px,1fr));gap:16px;}}
-        @media(min-width:1083px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;}}
+        @media(min-width:1024px){.card-grid{grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:18px;}}
         .drag-target{outline:3px dashed #3b82f6!important;outline-offset:3px;border-radius:14px;}
         .sub-group-header{border:none;background:none;cursor:pointer;width:100%;display:flex;align-items:center;gap:8px;padding:0.3rem 0;text-align:left;}
         select option{background:#fff;color:#0f172a;}
         input:focus,textarea:focus,select:focus{border-color:#3b82f6!important;box-shadow:0 0 0 3px rgba(59,130,246,0.14)!important;}
-        /* Reserve space for abs. buttons on all desktop widths */
-        @media(min-width:640px){
-          .header-center{padding-right:9rem;}
-        }
-        /* Merge 2 tab rows into one scrollable row at 5-card-per-row breakpoint */
-        @media(min-width:1000px){
-          .tabs-outer{flex-direction:row!important;overflow-x:auto;padding:6px 1.75rem 0;justify-content:center;}
-          .tabs-inner{display:contents!important;}
-        }
-        @media(max-width:639px){
-          .header-inner{padding:0.6rem 0.75rem!important;}
-          .header-center{column-gap:0.75rem!important;row-gap:0.5rem!important;}
-          .scyther-logo{width:72px!important;height:72px!important;}
-          .progress-bar-wrap{min-width:0!important;max-width:100%!important;}
-          .header-right-btns{position:static!important;flex-direction:row!important;align-items:center!important;gap:8px!important;}
-          .filter-bar-inner{padding:0.5rem 0.6rem!important;}
-          .tabs-inner{padding:4px 0.4rem 0!important;}
-          .main-pad{padding:0.75rem!important;}
-        }
       `}</style>
 
       {/* ── HEADER — scrolls away ── */}
       <header style={{background:"rgba(255,255,255,0.97)",borderBottom:"2px solid #e2e8f0",boxShadow:"0 2px 12px rgba(0,0,0,0.07)",position:"relative",zIndex:100}}>
-          <div className="header-inner" style={{maxWidth:1700,margin:"0 auto",padding:"1rem 1.75rem",display:"flex",alignItems:"flex-start",gap:"1rem"}}>
+          <div style={{maxWidth:1700,margin:"0 auto",padding:"1rem 1.75rem",display:"flex",alignItems:"flex-start",gap:"1rem"}}>
           
-          <div className="header-center" style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",columnGap:"2.5rem",rowGap:"0.75rem",flexWrap:"wrap",minWidth:0}}>
+          {/* ── Top-right button cluster: Resources + Reorder ── */}
+          <div style={{display:"flex",flexDirection:"column",alignItems:"stretch",gap:6,position:"absolute",right:"1.75rem",top:"1rem"}}>
+
+            <div style={{display:"flex",flexDirection:"row",alignItems:"flex-start",gap:8}}>
+
+            {/* Resources button + dropdown */}
+            <div ref={resourceDropRef} style={{position:"relative"}}>
+              <button onClick={()=>setResourceDropOpen(v=>!v)}
+                style={{padding:"0.42rem 1.1rem",borderRadius:9,fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",border:`2px solid ${resourceDropOpen?"#0891b2":"#e2e8f0"}`,background:resourceDropOpen?"#ecfeff":"#f8fafc",color:resourceDropOpen?"#0e7490":"#475569",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,whiteSpace:"nowrap"}}>
+                <span style={{fontSize:"1.2rem",lineHeight:1}}>🔗</span>
+                <span style={{fontSize:"0.56rem",textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:700,color:resourceDropOpen?"#0e7490":"#6b7280",marginTop:2}}>resources</span>
+              </button>
+              {resourceDropOpen&&(
+                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#1e293b",border:"1.5px solid #334155",borderRadius:12,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",minWidth:200,zIndex:200,overflow:"hidden"}}>
+                  <div style={{padding:"0.6rem 0.85rem",borderBottom:"1.5px solid #334155"}}>
+                    <span style={{fontSize:"0.65rem",color:"#94a3b8",textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:700,fontFamily:"monospace"}}>Resources</span>
+                  </div>
+                  <div style={{padding:"0.35rem 0"}}>
+                    {Object.entries(RESOURCE_URLS).map(([label,url])=>(
+                      <a key={label} href={url} target="_blank" rel="noreferrer"
+                        style={{display:"block",padding:"0.45rem 0.85rem",fontSize:"0.78rem",fontFamily:"monospace",fontWeight:600,color:"#e2e8f0",textDecoration:"none",whiteSpace:"nowrap"}}
+                        onMouseEnter={e=>e.currentTarget.style.background="#334155"}
+                        onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                        🔗 {label}
+                      </a>
+                    ))}
+                  </div>
+                </div>
+              )}
+            </div>
+
+            {/* Reorder button */}
+            <div style={{position:"relative"}}>
+              <button onClick={()=>setReorderMode(v=>!v)} style={{padding:"0.42rem 0.9rem",borderRadius:9,border:`2px solid ${reorderMode?"#d97706":"#e2e8f0"}`,background:reorderMode?"#fffbeb":"#f8fafc",color:reorderMode?"#92400e":"#475569",fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
+                <span style={{fontSize:"1.2rem",lineHeight:1}}>{reorderMode?"🔓":"🔒"}</span>
+                <span style={{fontSize:"0.56rem",textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:700,color:reorderMode?"#92400e":"#6b7280",marginTop:2}}>reorder</span>
+              </button>
+              {reorderMode&&<div style={{position:"absolute",top:"calc(100% + 6px)",right:0,fontSize:"0.7rem",color:"#d97706",fontFamily:"monospace",fontWeight:700,whiteSpace:"nowrap"}}>⟺ Drag to reorder</div>}
+            </div>
+            </div>
+
+            <div ref={categoryDropRef} style={{position:"relative",zIndex:60}}>
+              <button onClick={()=>setCategoryDropOpen(v=>!v)} style={{padding:"0.4rem 1rem",borderRadius:9,fontFamily:"monospace",fontSize:"0.75rem",fontWeight:700,cursor:"pointer",transition:"all 0.18s",border:`2px solid ${hiddenCategories.size>0?"#3b82f6":"#e2e8f0"}`,background:hiddenCategories.size>0?"#eff6ff":"#f8fafc",color:hiddenCategories.size>0?"#1e40af":"#475569",display:"flex",alignItems:"center",justifyContent:"center",gap:5,whiteSpace:"nowrap",width:"100%"}}>
+                🌐 Categories
+                {hiddenCategories.size>0&&<span style={{background:"#3b82f6",color:"#fff",borderRadius:"50%",width:16,height:16,fontSize:"0.6rem",fontWeight:800,display:"inline-flex",alignItems:"center",justifyContent:"center",flexShrink:0}}>{allCategories.length-hiddenCategories.size}</span>}
+              </button>
+              {categoryDropOpen&&(
+                <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#1e293b",border:"1.5px solid #334155",borderRadius:12,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",minWidth:220,zIndex:200,overflow:"hidden"}}>
+                  <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.6rem 0.85rem",borderBottom:"1.5px solid #334155"}}>
+                    <span style={{fontSize:"0.65rem",color:"#94a3b8",textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:700,fontFamily:"monospace"}}>Categories</span>
+                    <div style={{display:"flex",gap:6}}>
+                      {[["All",()=>setHiddenCategoriesAndPersist(new Set())],["None",()=>setHiddenCategoriesAndPersist(new Set(allCategories))]].map(([lbl,fn])=>(
+                        <button key={lbl} onClick={fn} style={{fontSize:"0.62rem",fontFamily:"monospace",fontWeight:700,padding:"2px 8px",borderRadius:5,cursor:"pointer",background:"#334155",border:"1px solid #475569",color:"#94a3b8"}}>{lbl}</button>
+                      ))}
+                    </div>
+                  </div>
+                  <div style={{maxHeight:320,overflowY:"auto",padding:"0.35rem 0",display:"grid",gridTemplateColumns:"1fr 1fr"}}>
+                    {allCategories.map(category=>{
+                      const hidden=hiddenCategories.has(category);
+                      return (
+                        <label key={category} style={{display:"flex",alignItems:"center",gap:8,padding:"0.42rem 0.7rem",cursor:"pointer",background:"transparent"}}
+                          onMouseEnter={e=>e.currentTarget.style.background="#334155"}
+                          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
+                          <input type="checkbox" checked={!hidden} style={{width:14,height:14,accentColor:"#3b82f6",cursor:"pointer",flexShrink:0}}
+                            onChange={()=>setHiddenCategoriesAndPersist(prev=>{const n=new Set(prev);n.has(category)?n.delete(category):n.add(category);return n;})}/>
+                          <span style={{display:"inline-flex",alignItems:"center",flexShrink:0}}><CategoryIcon category={category} size={20}/></span>
+                          <span style={{fontSize:"0.73rem",fontFamily:"monospace",fontWeight:600,color:hidden?"#475569":"#e2e8f0",textDecoration:hidden?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
+                            {CATEGORY_META[category]?.label||category}
+                          </span>
+                        </label>
+                      );
+                    })}
+                  </div>
+                </div>
+              )}
+            </div>
+
+
+          </div>
+
+          <div style={{flex:1,display:"flex",alignItems:"center",justifyContent:"center",columnGap:"2.5rem",rowGap:"0.75rem",flexWrap:"wrap",minWidth:0}}>
             {/* Logo */}
             <div style={{display:"flex",alignItems:"center",gap:"0.5rem",flexShrink:0}}>
-              <img src={SCYTHER_ICON} alt="Scyther" className="scyther-logo" style={{width:120,height:120,imageRendering:"pixelated",filter:"drop-shadow(0 3px 8px rgba(5,150,105,0.28))"}}/>
+              <img src={SCYTHER_ICON} alt="Scyther" style={{width:120,height:120,imageRendering:"pixelated",filter:"drop-shadow(0 3px 8px rgba(5,150,105,0.28))"}}/>
               <div>
                 <h1 style={{fontFamily:"'Syne',sans-serif",fontSize:"1.75rem",fontWeight:800,color:"#0f172a",letterSpacing:"-0.025em",lineHeight:1}}>Scyther</h1>
                 <p style={{fontSize:"0.75rem",color:"#94a3b8",letterSpacing:"0.16em",textTransform:"uppercase",marginTop:3,fontWeight:700}}>Collection Checklist</p>
@@ -1995,103 +2056,37 @@ function App() {
             </div>
 
           {/* Progress */}
-          <div className="progress-bar-wrap" style={{minWidth:260,maxWidth:440,height:"3.1rem",display:"flex",flexDirection:"column",justifyContent:"flex-end",gap:"0.4rem"}}>
+          <div style={{minWidth:260,maxWidth:440,height:"3.1rem",display:"flex",flexDirection:"column",justifyContent:"flex-end",gap:"0.4rem"}}>
             <div style={{display:"flex",justifyContent:"space-between"}}>
               <span style={{fontSize:"0.82rem",color:"#475569",textTransform:"uppercase",letterSpacing:"0.1em",fontWeight:700}}>Progress</span>
               <span style={{fontSize:"0.9rem",color:"#334155",fontFamily:"monospace",fontWeight:700}}>
-                {stats.ownedCount} / {stats.total} ({Math.round(stats.ownedCount/(stats.total||1)*100)}%)
+                {stats.ownedCount+stats.orderedCount} / {stats.total} ({Math.round((stats.ownedCount+stats.orderedCount)/(stats.total||1)*100)}%)
               </span>
             </div>
             <div style={{height:22,background:"#e2e8f0",borderRadius:11,overflow:"hidden",display:"flex",border:"2px solid #cbd5e1"}}>
-              <div title={`Owned: ${stats.ownedCount-stats.orderedCount}`} style={{height:"100%",width:`${(stats.ownedCount-stats.orderedCount)/(stats.total||1)*100}%`,background:"#34d399",transition:"width 0.6s ease",cursor:"default"}}/>
-              {stats.orderedCount>0&&<div title={`Ordered: ${stats.orderedCount}`} style={{height:"100%",width:`${stats.orderedCount/(stats.total||1)*100}%`,background:"#fbbf24",transition:"width 0.6s ease",cursor:"default"}}/>}
+              <div style={{height:"100%",width:`${stats.ownedCount/(stats.total||1)*100}%`,background:"#34d399",transition:"width 0.6s ease"}}/>
+              {stats.orderedCount>0&&<div style={{height:"100%",width:`${stats.orderedCount/(stats.total||1)*100}%`,background:"#fbbf24",transition:"width 0.6s ease"}}/>}
             </div>
           </div>
 
-          {/* Stat pills + action buttons */}
-          <div style={{display:"flex",gap:"0.75rem",flexShrink:0,alignItems:"center",flexWrap:"wrap"}}>
-            <div style={{display:"flex",gap:"0.75rem",flexShrink:0}}>
-              <div title={`${Math.round(stats.ownedCount/(stats.total||1)*100)}%`} style={{textAlign:"center",background:"#f0fdf4",border:"2px solid #bbf7d0",borderRadius:11,padding:"0.42rem 1.1rem",cursor:"default"}}>
-                <div style={{fontSize:"1.2rem",fontWeight:800,color:"#059669",fontFamily:"monospace",lineHeight:1}}>{stats.ownedCount}</div>
-                <div style={{fontSize:"0.56rem",color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:2,fontWeight:700}}>owned</div>
-              </div>
-              {!hidePrices&&(
-              <div style={{textAlign:"center",background:"#ecfeff",border:"2px solid #a5f3fc",borderRadius:11,padding:"0.42rem 1.1rem"}}>
-                <div style={{fontSize:"1.2rem",fontWeight:800,color:"#0891b2",fontFamily:"monospace",lineHeight:1}}>€{stats.totalValue.toFixed(2)}</div>
-                <div style={{fontSize:"0.56rem",color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:2,fontWeight:700}}>spent</div>
-              </div>
-              )}
+          {/* Stat pills */}
+          <div style={{display:"flex",gap:"0.75rem",flexShrink:0}}>
+            <div title={`${Math.round(stats.ownedCount/(stats.total||1)*100)}%`} style={{textAlign:"center",background:"#f0fdf4",border:"2px solid #bbf7d0",borderRadius:11,padding:"0.42rem 1.1rem",cursor:"default"}}>
+              <div style={{fontSize:"1.2rem",fontWeight:800,color:"#059669",fontFamily:"monospace",lineHeight:1}}>{stats.ownedCount}</div>
+              <div style={{fontSize:"0.56rem",color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:2,fontWeight:700}}>owned</div>
             </div>
-            {/* ── Action buttons: Resources + Reorder + Categories ── */}
-            <div className="header-right-btns" style={{display:"flex",flexDirection:"column",alignItems:"stretch",gap:6,position:"absolute",right:"1.75rem",top:"1rem"}}>
-              {/* Resources button + dropdown */}
-              <div ref={resourceDropRef} style={{position:"relative"}}>
-                <button onClick={()=>setResourceDropOpen(v=>!v)}
-                  style={{padding:"0.42rem 0.9rem",borderRadius:9,fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",border:`2px solid ${resourceDropOpen?"#0891b2":"#e2e8f0"}`,background:resourceDropOpen?"#ecfeff":"#f8fafc",color:resourceDropOpen?"#0e7490":"#475569",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-                  <span style={{fontSize:"1.2rem",lineHeight:1}}>🔗</span>
-                </button>
-                {resourceDropOpen&&(
-                  <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#1e293b",border:"1.5px solid #334155",borderRadius:12,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",minWidth:200,zIndex:200,overflow:"hidden"}}>
-                    <div style={{padding:"0.6rem 0.85rem",borderBottom:"1.5px solid #334155"}}>
-                      <span style={{fontSize:"0.65rem",color:"#94a3b8",textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:700,fontFamily:"monospace"}}>Resources</span>
-                    </div>
-                    <div style={{padding:"0.35rem 0"}}>
-                      {Object.entries(RESOURCE_URLS).map(([label,url])=>(
-                        <a key={label} href={url} target="_blank" rel="noreferrer"
-                          style={{display:"block",padding:"0.45rem 0.85rem",fontSize:"0.78rem",fontFamily:"monospace",fontWeight:600,color:"#e2e8f0",textDecoration:"none",whiteSpace:"nowrap"}}
-                          onMouseEnter={e=>e.currentTarget.style.background="#334155"}
-                          onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                          🔗 {label}
-                        </a>
-                      ))}
-                    </div>
-                  </div>
-                )}
+            {stats.orderedCount>0&&(
+              <div title={`${Math.round(stats.orderedCount/(stats.total||1)*100)}%`} style={{textAlign:"center",background:"#fffbeb",border:"2px solid #fde68a",borderRadius:11,padding:"0.42rem 1.1rem",cursor:"default"}}>
+                <div style={{fontSize:"1.2rem",fontWeight:800,color:"#d97706",fontFamily:"monospace",lineHeight:1}}>{stats.orderedCount}</div>
+                <div style={{fontSize:"0.56rem",color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:2,fontWeight:700}}>ordered</div>
               </div>
-              {/* Reorder button */}
-              <div style={{position:"relative"}}>
-                <button onClick={()=>setReorderMode(v=>!v)} style={{padding:"0.42rem 0.9rem",borderRadius:9,border:`2px solid ${reorderMode?"#d97706":"#e2e8f0"}`,background:reorderMode?"#fffbeb":"#f8fafc",color:reorderMode?"#92400e":"#475569",fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-                  <span style={{fontSize:"1.2rem",lineHeight:1}}>{reorderMode?"🔓":"🔒"}</span>
-                </button>
-                {reorderMode&&<div style={{position:"absolute",top:"calc(100% + 6px)",right:0,fontSize:"0.7rem",color:"#d97706",fontFamily:"monospace",fontWeight:700,whiteSpace:"nowrap"}}>⟺ Drag to reorder</div>}
-              </div>
-              {/* Categories dropdown */}
-              <div ref={categoryDropRef} style={{position:"relative",zIndex:60}}>
-                <button onClick={()=>setCategoryDropOpen(v=>!v)} style={{padding:"0.42rem 0.9rem",borderRadius:9,fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",border:`2px solid ${hiddenCategories.size>0?"#3b82f6":"#e2e8f0"}`,background:hiddenCategories.size>0?"#eff6ff":"#f8fafc",color:hiddenCategories.size>0?"#1e40af":"#475569",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2,position:"relative"}}>
-                  <span style={{fontSize:"1.2rem",lineHeight:1}}>🌐</span>
-                  {hiddenCategories.size>0&&<span style={{position:"absolute",top:-4,right:-4,background:"#3b82f6",color:"#fff",borderRadius:"50%",width:14,height:14,fontSize:"0.55rem",fontWeight:800,display:"inline-flex",alignItems:"center",justifyContent:"center"}}>{allCategories.length-hiddenCategories.size}</span>}
-                </button>
-                {categoryDropOpen&&(
-                  <div style={{position:"absolute",top:"calc(100% + 8px)",right:0,background:"#1e293b",border:"1.5px solid #334155",borderRadius:12,boxShadow:"0 8px 32px rgba(0,0,0,0.4)",minWidth:220,zIndex:200,overflow:"hidden"}}>
-                    <div style={{display:"flex",alignItems:"center",justifyContent:"space-between",padding:"0.6rem 0.85rem",borderBottom:"1.5px solid #334155"}}>
-                      <span style={{fontSize:"0.65rem",color:"#94a3b8",textTransform:"uppercase",letterSpacing:"0.12em",fontWeight:700,fontFamily:"monospace"}}>Categories</span>
-                      <div style={{display:"flex",gap:6}}>
-                        {[["All",()=>setHiddenCategoriesAndPersist(new Set())],["None",()=>setHiddenCategoriesAndPersist(new Set(allCategories))]].map(([lbl,fn])=>(
-                          <button key={lbl} onClick={fn} style={{fontSize:"0.62rem",fontFamily:"monospace",fontWeight:700,padding:"2px 8px",borderRadius:5,cursor:"pointer",background:"#334155",border:"1px solid #475569",color:"#94a3b8"}}>{lbl}</button>
-                        ))}
-                      </div>
-                    </div>
-                    <div style={{maxHeight:320,overflowY:"auto",padding:"0.35rem 0",display:"grid",gridTemplateColumns:"1fr 1fr"}}>
-                      {allCategories.map(category=>{
-                        const hidden=hiddenCategories.has(category);
-                        return (
-                          <label key={category} style={{display:"flex",alignItems:"center",gap:8,padding:"0.42rem 0.7rem",cursor:"pointer",background:"transparent"}}
-                            onMouseEnter={e=>e.currentTarget.style.background="#334155"}
-                            onMouseLeave={e=>e.currentTarget.style.background="transparent"}>
-                            <input type="checkbox" checked={!hidden} style={{width:14,height:14,accentColor:"#3b82f6",cursor:"pointer",flexShrink:0}}
-                              onChange={()=>setHiddenCategoriesAndPersist(prev=>{const n=new Set(prev);n.has(category)?n.delete(category):n.add(category);return n;})}/>
-                            <span style={{display:"inline-flex",alignItems:"center",flexShrink:0}}><CategoryIcon category={category} size={20}/></span>
-                            <span style={{fontSize:"0.73rem",fontFamily:"monospace",fontWeight:600,color:hidden?"#475569":"#e2e8f0",textDecoration:hidden?"line-through":"none",overflow:"hidden",textOverflow:"ellipsis",whiteSpace:"nowrap"}}>
-                              {CATEGORY_META[category]?.label||category}
-                            </span>
-                          </label>
-                        );
-                      })}
-                    </div>
-                  </div>
-                )}
-              </div>
+            )}
+            {!hidePrices&&(
+            <div style={{textAlign:"center",background:"#ecfeff",border:"2px solid #a5f3fc",borderRadius:11,padding:"0.42rem 1.1rem"}}>
+              <div style={{fontSize:"1.2rem",fontWeight:800,color:"#0891b2",fontFamily:"monospace",lineHeight:1}}>€{stats.totalValue.toFixed(2)}</div>
+              <div style={{fontSize:"0.56rem",color:"#6b7280",textTransform:"uppercase",letterSpacing:"0.1em",marginTop:2,fontWeight:700}}>spent</div>
             </div>
+            )}
           </div>
           </div>
           </div>
@@ -2101,46 +2096,10 @@ function App() {
       {/* ── STICKY BAR: tabs + filter ── */}
       <div style={{position:"sticky",top:0,zIndex:50,background:"#ffffff",boxShadow:"0 2px 12px rgba(0,0,0,0.07)"}}>
 
-        {/* Category tabs — 2 rows on mobile, 1 row on desktop */}
-        <div className="tabs-outer" style={{display:"flex",flexDirection:"column",alignItems:"stretch",borderBottom:"1.5px solid #e2e8f0",background:"#fff"}}>
-        {/* Row 1: language edition categories (EN, JPN, DE, …, S-CH) */}
-        <div className="tabs-inner" style={{display:"flex",justifyContent:"center",overflowX:"auto",padding:"6px 1.75rem 0",minWidth:0}}>
-          {allCategories.filter(l=>CATEGORY_ORDER.indexOf(l)<=CATEGORY_ORDER.indexOf("S-CH")).map(l=>({category:l,...(CATEGORY_META[l]||{categoryCode:null,label:l})})).filter(({category})=>{
-            const s=categoryStats[category]||{owned:0,total:0};
-            return s.total>0;
-          }).map(({category,categoryCode})=>{
-            const s=categoryStats[category]||{owned:0,total:0};
-            const active=activeCategory===category;
-            const hidden=hiddenCategories.has(category);
-            const pct=s.total?Math.round(s.owned/s.total*100):0;
-            return(
-              <button key={category} className="category-tab"
-                onClick={e=>{
-                  if(e.ctrlKey||e.metaKey){
-                    const url=CATEGORY_URLS[category];
-                    if(url){e.preventDefault();window.open(url,"_blank","noopener");}
-                    return;
-                  }
-                  if(e.shiftKey){
-                    setHiddenCategoriesAndPersist(prev=>{const n=new Set(prev);n.has(category)?n.delete(category):n.add(category);return n;});
-                  } else {
-                    setActiveCategory(category);
-                  }
-                }}
-                title={hidden?`${category} (hidden — shift+click to show)`:`${pct}%`}
-                style={{padding:"0.4rem 1.1rem",color:active?"#2563eb":hidden?"#cbd5e1":"#475569",borderBottom:`3px solid ${active?"#2563eb":"transparent"}`,display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:68,flexShrink:0,opacity:hidden?0.45:1,transition:"opacity 0.15s",background:"transparent",borderRadius:0}}>
-                <span style={{fontSize:"1.05rem",lineHeight:1,display:"inline-flex",alignItems:"center",justifyContent:"center"}}>
-                  {categoryCode ? <CategoryImg code={categoryCode} size={20}/> : category}
-                </span>
-                <span style={{fontSize:"0.78rem",fontWeight:active?800:500,letterSpacing:"0.03em"}}>{category}</span>
-                {s.owned>0&&<span style={{fontSize:"0.62rem",color:active?"#2563eb":"#94a3b8",fontFamily:"monospace",fontWeight:600}}>{`${s.owned}/${s.total}`}</span>}
-              </button>
-            );
-          })}
-        </div>
-        {/* Row 2: ALL + card-type categories (Cards, Stickers, Chips, …) */}
-        <div className="tabs-inner" style={{display:"flex",justifyContent:"center",overflowX:"auto",padding:"2px 1.75rem 0",minWidth:0}}>
-          {[{category:"ALL",categoryCode:null},...allCategories.filter(l=>CATEGORY_ORDER.indexOf(l)>CATEGORY_ORDER.indexOf("S-CH")).map(l=>({category:l,...(CATEGORY_META[l]||{categoryCode:null,label:l})}))].filter(({category})=>{
+        {/* Category tabs */}
+        <div style={{display:"flex",alignItems:"center",borderBottom:"1.5px solid #e2e8f0",background:"#fff"}}>
+        <div style={{flex:1,display:"flex",justifyContent:"center",overflowX:"auto",padding:"6px 1.75rem 0",minWidth:0}}>
+          {[...allCategories.filter(l=>CATEGORY_ORDER.indexOf(l)<=CATEGORY_ORDER.indexOf("S-CH")).map(l=>({category:l,...(CATEGORY_META[l]||{categoryCode:null,label:l})})),{category:"ALL",categoryCode:null},...allCategories.filter(l=>CATEGORY_ORDER.indexOf(l)>CATEGORY_ORDER.indexOf("S-CH")).map(l=>({category:l,...(CATEGORY_META[l]||{categoryCode:null,label:l})}))].filter(({category})=>{
             if(category==="ALL")return true;
             const s=categoryStats[category]||{owned:0,total:0};
             return s.total>0;
@@ -2164,7 +2123,7 @@ function App() {
                   }
                 }}
                 title={hidden?`${category} (hidden — shift+click to show)`:`${pct}%`}
-                style={{padding:category==="ALL"?"calc(0.4rem + 6px) 1.1rem 0.4rem":"0.4rem 1.1rem",color:active?"#2563eb":hidden?"#cbd5e1":"#475569",borderBottom:`3px solid ${active?"#2563eb":"transparent"}`,display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:68,flexShrink:0,opacity:hidden?0.45:1,transition:"opacity 0.15s",background:category==="ALL"?"#f1f5f9":"transparent",borderLeft:category==="ALL"?"2px solid #e2e8f0":"none",borderRight:category==="ALL"?"2px solid #e2e8f0":"none",borderRadius:0,margin:category==="ALL"?"-2px 5px 0":0}}>
+                style={{padding:category==="ALL"?"calc(0.4rem + 6px) 1.1rem 0.4rem":"0.4rem 1.1rem",color:active?"#2563eb":hidden?"#cbd5e1":"#475569",borderBottom:`3px solid ${active?"#2563eb":"transparent"}`,display:"flex",flexDirection:"column",alignItems:"center",gap:3,minWidth:68,flexShrink:0,opacity:hidden?0.45:1,transition:"opacity 0.15s",background:category==="ALL"?"#f1f5f9":"transparent",borderLeft:category==="ALL"?"2px solid #e2e8f0":"none",borderRight:category==="ALL"?"2px solid #e2e8f0":"none",borderRadius:0,margin:category==="ALL"?"-6px 5px 0":0}}>
                 <span style={{fontSize:"1.05rem",lineHeight:1,display:"inline-flex",alignItems:"center",justifyContent:"center"}}>
                   {category==="ALL" ? "🌐" : category==="Cards (JPN)" ? <JpnIcon size={26}/> : category==="Cards (EN)" ? <EnIcon size={26}/> : category==="Cameo" ? <CameoIcon size={26}/> : category==="Other" ? <OtherIcon size={26}/> : category==="Misc" ? <MiscIcon size={26}/> : category==="Flats" ? <FlatsIcon size={26}/> : category==="Chips" ? <ChipsIcon size={26}/> : category==="Figures" ? <FiguresIcon size={26}/> : category==="Stickers" ? <StickersIcon size={26}/> : category==="Thick" ? <ThickIcon size={26}/> : categoryCode ? <CategoryImg code={categoryCode} size={20}/> : category}
                 </span>
@@ -2173,11 +2132,11 @@ function App() {
               </button>
             );
           })}
-        </div>
+        </div>{/* end scrollable tabs */}
         </div>{/* end categories outer wrapper */}
 
       {/* ── FILTER BAR ── */}
-      <div className="filter-bar-inner" style={{background:"#ffffff",borderBottom:"2px solid #e2e8f0",padding:"0.72rem 1.75rem",boxShadow:"0 1px 6px rgba(0,0,0,0.05)"}}>
+      <div style={{background:"#ffffff",borderBottom:"2px solid #e2e8f0",padding:"0.72rem 1.75rem",boxShadow:"0 1px 6px rgba(0,0,0,0.05)"}}>
         <div style={{maxWidth:1700,margin:"0 auto",display:"flex",alignItems:"center",gap:"0.75rem",flexWrap:"wrap"}}>
           <div style={{flex:1,display:"flex",gap:"0.55rem",alignItems:"center",flexWrap:"wrap",justifyContent:"center",minWidth:0}}>
 
@@ -2270,7 +2229,7 @@ function App() {
       </div>{/* end sticky bar */}
 
       {/* ── GRID ── */}
-      <main className="main-pad" style={{maxWidth:1700,margin:"0 auto",padding:"1.75rem"}}>
+      <main style={{maxWidth:1700,margin:"0 auto",padding:"1.75rem"}}>
         {visibleCards.length===0
           ?<div style={{textAlign:"center",padding:"6rem",display:"flex",flexDirection:"column",alignItems:"center",gap:24}}>
               <img src={SCYTHER_ICON} alt="" style={{width:72,imageRendering:"pixelated",opacity:0.3}}/>
