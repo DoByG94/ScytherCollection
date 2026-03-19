@@ -1065,9 +1065,9 @@ function getInitData(card) {
 function getPhotoSrcs(card) {
   const base = card.sub ? `./${card.category}/${card.sub}` : `./${card.category}`;
   if (typeof card.photo === 'string') {
-    return card.photo ? [`${base.toLowerCase()}/${card.photo.toLowerCase()}.png`] : [];
+    return card.photo ? [`${base}/${card.photo}.png`.toLowerCase()] : [];
   } else if (card.photo && typeof card.photo === 'object') {
-    return Object.values(card.photo).map(v => `${base}/${v}.png`);
+    return Object.values(card.photo).map(v => `${base}/${v}.png`.toLowerCase());
   }
   return [];
 }
