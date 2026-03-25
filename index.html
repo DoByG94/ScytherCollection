@@ -2170,7 +2170,7 @@ function App() {
             const s=categoryStats[category]||{owned:0,total:0};
             return s.total>0;
           }).map(({category,categoryCode})=>{
-            const s=category==="ALL"?{owned:stats.ownedCount+stats.orderedCount,total:stats.total}:(categoryStats[category]||{owned:0,total:0});
+            const s=category==="ALL"?{owned:stats.ownedCount,total:stats.total}:(categoryStats[category]||{owned:0,total:0});
             const active=activeCategory===category;
             const hidden=category!=="ALL"&&hiddenCategories.has(category);
             const pct=s.total?Math.round(s.owned/s.total*100):0;
