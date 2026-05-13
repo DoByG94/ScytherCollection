@@ -2272,7 +2272,9 @@ function App() {
           .header-center{column-gap:1.5rem!important;padding-right:2.25rem!important;}
           .header-inner{gap:0.4rem!important;}
         }
-
+        @media(max-width:950px){
+          .stat-pills{flex-direction:column!important;gap:0.35rem!important;}
+        }
         @keyframes photoSlideInRight{from{transform:translateX(40%);opacity:0}to{transform:translateX(0);opacity:1}}
         @keyframes photoSlideInLeft{from{transform:translateX(-40%);opacity:0}to{transform:translateX(0);opacity:1}}
       `}</style>
