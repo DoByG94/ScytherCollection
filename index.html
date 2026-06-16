@@ -6,7 +6,7 @@
   <title>DoByG's Scyther Collection Checklist</title>
   <script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
   <script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
-  <script src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+  <script src="https://unpkg.com/@babel/standalone@7.23.10/babel.min.js"></script>
   <link href="https://fonts.googleapis.com/css2?family=Syne:wght@400;700;800&display=swap" rel="stylesheet">
   <style>
     * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -25,7 +25,7 @@
 </head>
 <body>
   <div id="root"></div>
-  <script type="text/babel">
+  <script type="text/babel" data-presets="react">
 
 // Set to false to disable all editing when hosting publicly
 const EDITING_ENABLED = false;
@@ -1048,9 +1048,9 @@ const RAW_CARDS = [
   {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Red Base Figure (A, Gold)",releaseDate:"1997",photo:"97_plakoro_gold_a"},
   {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Red Base Figure (B, Gold)",releaseDate:"1997",photo:"97_plakoro_gold_b"},
   {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Red Base Figure (C, Gold)",releaseDate:"1997",photo:"97_plakoro_gold_c"},
-  {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Green Base Figure (A, Silver)",releaseDate:"1997",photo:"97_plakoro_silver_a"},
-  {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Green Base Figure (B, Silver)",releaseDate:"1997",photo:"97_plakoro_silver_b"},
-  {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Green Base Figure (C, Silver)",releaseDate:"1997",photo:"97_plakoro_silver_c"},
+  {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Green Base Figure (A, Silver)",releaseDate:"1997",photo:"97_plakoro_silver_a",condition:"Ordered",price:5.41},
+  {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Green Base Figure (B, Silver)",releaseDate:"1997",photo:"97_plakoro_silver_b",condition:"Ordered",price:5.41},
+  {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"97 Plakoro Battle Green Base Figure (C, Silver)",releaseDate:"1997",photo:"97_plakoro_silver_c",condition:"Ordered",price:5.41},
   {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"99 Plakoro Character Color 2 Figure (E)",releaseDate:"1999",photo:["99_plakoro_e","99_plakoro_all"]},
   {category:"Figures",sub:"Dice",type:"Regular",set:"bandai",num:"",name:"99 Plakoro Character Color 2 Figure (F)",releaseDate:"1999",photo:"99_plakoro_f",condition:"Ordered",price:14.56},
   //{category:"Figures",sub:"Dice",type:"Special",set:"corocoro",num:"",name:"99 Plakoro Character Color 2 Figure Coro Coro (E, White)",releaseDate:"1999",photo:"99_plakoro_corocoro_white_e"},
