@@ -619,7 +619,7 @@ const RAW_CARDS = [
   {category:"Cards (EN)",sub:"Main",type:"Regular",set:"topps",num:"123",name:"00 Topps Series 3",releaseDate:"2000",photo:["00_topps","00_topps_back"],illustration:"cut",condition:"Ordered",price:17.06},
   {category:"Cards (EN)",sub:"Main",type:"Holo",set:"topps",num:"123",name:"00 Topps Series 3 (Foil)",releaseDate:"2000",photo:["00_topps_foil","00_topps_back"],illustration:"cut",condition:"Ordered",price:36.47},
   {category:"Cards (EN)",sub:"Main",type:"Holo",set:"topps",num:"123",name:"00 Topps Series 3 (Rainbow)",releaseDate:"2000",photo:["00_topps_rainbow","00_topps_back"],illustration:"cut"},
-  {category:"Cards (EN)",sub:"Main",type:"Regular",set:"topps",num:"PC9",name:"00 Topps Series 3 (Clear)",releaseDate:"2000",photo:["00_topps_clear","00_topps_clear_back"],illustration:"side",condition:"Ordered",price:31.97},
+  {category:"Cards (EN)",sub:"Main",type:"Regular",set:"topps",num:"PC9",name:"00 Topps Series 3 (Clear)",releaseDate:"2000",photo:["00_topps_clear","00_topps_clear_back"],illustration:"side",condition:"Ordered",price:34.10},
   {category:"Cards (EN)",sub:"Main",type:"Holo",set:"topps",num:"123",name:"00 Topps Chrome",releaseDate:"2000",photo:["00_topps_chrome","00_topps_chrome_back"],illustration:"cut",url:"https://www.ebay.ie/sch/i.html?_nkw=scyther+topps+chrome&_sacat=0&_from=R40&_trksid=p2334524.m570.l1313&_odkw=scyther+topps+TV+Animation+series+3&_osacat=0"},
   {category:"Cards (EN)",sub:"Main",type:"Holo",set:"topps",num:"123",name:"00 Topps Chrome (Spectra)",releaseDate:"2000",photo:["00_topps_spectra","00_topps_chrome_back"],illustration:"cut"},
   {category:"Cards (EN)",sub:"Main",type:"Holo",set:"topps",num:"123",name:"00 Topps Chrome (Sparkle)",releaseDate:"2000",photo:["00_topps_sparkle","00_topps_chrome_back"],illustration:"cut"},
@@ -2037,11 +2037,10 @@ function TutorialModal({onClose}) {
 }
 
 // ─── Binder View — a single pocket in the grid (filled or empty) ────────────
-function BinderPocket({ card, cardData, userPhoto, onOpen, hideGrayOut, hidePrices }) {
-  const [hovered, setHovered] = useState(false);
+function BinderPocket({ card, cardData, userPhoto, onOpen, hideGrayOut }) {
   if (!card) {
     return (
-      <div style={{width:"100%",height:"100%",borderRadius:8,border:"2px dashed #cbd5e1",background:"#f8fafc"}}/>
+      <div style={{aspectRatio:"63/88",borderRadius:8,border:"2px dashed #cbd5e1",background:"#f8fafc"}}/>
     );
   }
   const ts = TYPE_STYLE[card.type] || TYPE_STYLE.Regular;
@@ -2054,21 +2053,16 @@ function BinderPocket({ card, cardData, userPhoto, onOpen, hideGrayOut, hidePric
   const containBg = card.sub?"#d8e0ee":"#f1f5f9";
   const isRevHolo = card.type === "Rev Holo";
   const name = cardData?.name || card.name || "";
-  const condColor = condition ? COND_COLORS[condition] : null;
-  const condBg = condition ? COND_BG[condition] : null;
-  const condBorder = condition ? COND_BORDER[condition] : null;
-  const priceVal = cardData?.price ?? card.price;
-  const hasPrice = priceVal !== undefined && priceVal !== null && priceVal !== "" && !isNaN(parseFloat(priceVal));
   return (
     <div onClick={()=>onOpen(card)}
-      onMouseEnter={e=>{setHovered(true);e.currentTarget.style.transform="translateY(-3px) scale(1.03)";}}
-      onMouseLeave={e=>{setHovered(false);e.currentTarget.style.transform="none";}}
       title={name||card.set}
-      style={{width:"100%",height:"100%",borderRadius:8,overflow:"hidden",cursor:"pointer",position:"relative",
+      style={{aspectRatio:"63/88",borderRadius:8,overflow:"hidden",cursor:"pointer",position:"relative",
         background:photo&&fitContain?containBg:ts.bg,
         border:`2px solid ${owned?ts.accent:ts.border}`,
         boxShadow:owned?`0 3px 12px ${ts.accent}44`:"0 1px 4px rgba(0,0,0,0.08)",
-        transition:"transform 0.15s ease"}}>
+        transition:"transform 0.15s ease"}}
+      onMouseEnter={e=>e.currentTarget.style.transform="translateY(-3px) scale(1.03)"}
+      onMouseLeave={e=>e.currentTarget.style.transform="none"}>
       {owned && (
         <div style={{position:"absolute",top:4,right:4,zIndex:5,background:"#475569",borderRadius:"50%",width:16,height:16,display:"flex",alignItems:"center",justifyContent:"center",fontSize:"0.5rem",fontWeight:900,color:"#fff"}}>✓</div>
       )}
@@ -2079,115 +2073,40 @@ function BinderPocket({ card, cardData, userPhoto, onOpen, hideGrayOut, hidePric
           </div>
       }
       {isRevHolo && <RevHoloOverlay/>}
-      {/* Type badge — top-left, always visible (mirrors the main grid's card tiles) */}
-      {isRevHolo && (
-        <div style={{position:"absolute",top:5,left:4,zIndex:4}}>
-          <span style={{fontSize:"0.5rem",padding:"2px 5px",borderRadius:3,background:"rgba(37,99,235,0.88)",color:"#dbeafe",fontFamily:"monospace",fontWeight:700,border:"1px solid rgba(191,219,254,0.5)"}}>REV HOLO</span>
-        </div>
-      )}
-      {card.type === "Holo" && (
-        <div style={{position:"absolute",top:5,left:4,zIndex:4}}>
-          <span style={{fontSize:"0.5rem",padding:"2px 5px",borderRadius:3,background:"rgba(249,115,22,0.88)",color:"#fed7aa",fontFamily:"monospace",fontWeight:700,border:"1px solid rgba(253,186,116,0.5)"}}>HOLO</span>
-        </div>
-      )}
-      {card.type === "First Ed" && (
-        <div style={{position:"absolute",top:5,left:4,zIndex:4}}>
-          <span style={{fontSize:"0.5rem",padding:"2px 5px",borderRadius:3,background:"rgba(4,120,87,0.88)",color:"#dcfce7",fontFamily:"monospace",fontWeight:700,border:"1px solid rgba(187,247,208,0.5)"}}>1ST ED</span>
-        </div>
-      )}
-      {card.type === "Special" && (
-        <div style={{position:"absolute",top:5,left:4,zIndex:4}}>
-          <span style={{fontSize:"0.5rem",padding:"2px 5px",borderRadius:3,background:"rgba(124,58,237,0.88)",color:"#ede9fe",fontFamily:"monospace",fontWeight:700,border:"1px solid rgba(221,214,254,0.5)"}}>SPECIAL</span>
-        </div>
-      )}
-      {/* Hover overlay — language/category icon + condition (bottom-left), price (bottom-right) */}
-      {hovered && (
-        <div style={{position:"absolute",inset:0,zIndex:9,pointerEvents:"none",
-          background:"linear-gradient(to bottom, rgba(15,23,42,0.45) 0%, rgba(15,23,42,0) 26%, rgba(15,23,42,0) 74%, rgba(15,23,42,0.45) 100%)"}}>
-          <div style={{position:"absolute",bottom:5,left:5,display:"flex",alignItems:"center",gap:4}}>
-            <span style={{background:"rgba(255,255,255,0.92)",borderRadius:5,padding:"2px 4px",display:"flex",alignItems:"center",boxShadow:"0 2px 8px rgba(0,0,0,0.25)"}}>
-              <CategoryIcon category={card.category} size={13}/>
-            </span>
-            {condition && (
-              <span style={{fontSize:"0.55rem",fontWeight:700,color:condColor,background:condBg,border:`1px solid ${condBorder}`,padding:"1px 5px",borderRadius:4,fontFamily:"monospace",boxShadow:"0 2px 8px rgba(0,0,0,0.25)"}}>
-                {({Mint:"MT",Excellent:"EX",Good:"GD",Played:"PL",Poor:"PO", Ordered: "ORD"}[condition] ?? condition)}
-              </span>
-            )}
-          </div>
-          {!hidePrices && hasPrice && (
-            <span style={{position:"absolute",bottom:5,right:5,fontSize:"0.55rem",fontWeight:700,color:"#059669",background:"#d1fae5",border:"1px solid #6ee7b7",padding:"1px 5px",borderRadius:4,fontFamily:"monospace",boxShadow:"0 2px 8px rgba(0,0,0,0.25)"}}>
-              €{parseFloat(priceVal).toFixed(2)}
-            </span>
-          )}
-        </div>
-      )}
     </div>
   );
 }
 
 const BINDER_NAV_BTN_STYLE = {width:44,height:44,borderRadius:"50%",border:"2px solid #e2e8f0",background:"#fff",fontSize:"1.4rem",fontWeight:800,color:"#334155",display:"flex",alignItems:"center",justifyContent:"center",boxShadow:"0 2px 10px rgba(0,0,0,0.08)",flexShrink:0};
-// Binder page geometry — computed in JS (not pure CSS) so we can do the pocket-scaling math
-// below: every page renders at the exact same fixed box size (matching a standard 4×3 page),
-// and pages with fewer columns/rows scale their pockets UP to fill that same fixed box,
-// instead of ending up as a smaller page.
-const BINDER_PADDING = 28; // page box padding (1.75rem), px
-const BINDER_GAP = 16;     // gap between pockets, px
-const CARD_ASPECT = 63/88; // pocket width/height ratio
-function useWindowWidth(){
-  const [w,setW] = useState(()=>window.innerWidth);
-  useEffect(()=>{
-    const onResize=()=>setW(window.innerWidth);
-    window.addEventListener("resize",onResize);
-    return ()=>window.removeEventListener("resize",onResize);
-  },[]);
-  return w;
-}
-function useBinderPageGeometry(){
-  const vw = useWindowWidth();
-  const pageWidthPx = Math.min(880, (Math.min(1700, vw) - 120) / 2);
-  const innerWidthPx = pageWidthPx - 2*BINDER_PADDING;
-  // Reference box height, based on a standard 4-column × 3-row page — every page's outer
-  // box is fixed to this height regardless of its own width/height.
-  const refPocketW = (innerWidthPx - 3*BINDER_GAP) / 4;
-  const refInnerHeightPx = 3*(refPocketW/CARD_ASPECT) + 2*BINDER_GAP;
-  const pageBoxHeightPx = refInnerHeightPx + 2*BINDER_PADDING;
-  return { pageWidthPx, innerWidthPx, refInnerHeightPx, pageBoxHeightPx };
-}
 
 // ─── Binder View — a single page within a spread (name/id caption + pocket grid) ─
 // Animates independently of its sibling page, hinged at its own spine edge (the inner
 // edge facing the other page) so a spread looks like two pages opening in parallel,
 // rather than the whole spread turning as one rigid unit.
-function BinderPage({ page, cards, cardDataMap, userPhotos, onOpenCard, hideGrayOut, hidePrices, side="single", animDir, geometry }) {
+function BinderPage({ page, cards, cardDataMap, userPhotos, onOpenCard, hideGrayOut, side="single", animDir }) {
   const width = page.width || 4;
   const height = page.height || 3;
   const cells = [];
   for (let pos=1; pos<=width*height; pos++) cells.push(cards[pos]||null);
-  const { pageWidthPx, innerWidthPx, refInnerHeightPx, pageBoxHeightPx } = geometry;
-  // Contain-fit the WxH pocket grid inside the fixed reference box (same box size as a
-  // standard 4×3 page): compute the largest pocket size — keeping the pocket's aspect
-  // ratio — that fits within both the fixed width and fixed height budgets, then center
-  // the grid inside the box. Fewer columns/rows means bigger pockets, not a smaller page.
-  // Portrait-heavy grids (more rows than columns, e.g. 3×4, 4×5) use square pockets
-  // instead of the card ratio, since the card shape leaves them too small/narrow to fit
-  // the page well.
-  const aspect = height > width ? 1 : CARD_ASPECT;
-  const pocketWByWidth = (innerWidthPx - (width-1)*BINDER_GAP) / width;
-  const pocketWByHeight = ((refInnerHeightPx - (height-1)*BINDER_GAP) / height) * aspect;
-  const pocketW = Math.min(pocketWByWidth, pocketWByHeight);
-  const pocketH = pocketW / aspect;
+  // Fixed, viewport-aware page width — deliberately independent of how many pages are
+  // in the *current* spread (1 for a cover, 2 for a spread), so every page renders at
+  // the exact same size regardless of whether it's shown alone or paired up; a lone
+  // page just ends up centered instead of stretching to fill the space.
+  // Sized to comfortably fit two of these side by side (plus gap/padding) in the
+  // viewport, capped so it doesn't get absurdly large on ultra-wide screens.
+  const pageWidth = "min(880px, calc((min(1700px, 100vw) - 120px) / 2))";
   const transformOrigin = side==="left" ? "right center" : side==="right" ? "left center" : "center center";
   return (
-    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,width:pageWidthPx,flexShrink:0,
+    <div style={{display:"flex",flexDirection:"column",alignItems:"center",gap:10,width:pageWidth,flexShrink:0,
         transformStyle:"preserve-3d",transformOrigin,
         animation: animDir ? `${animDir==="next"?"binderTurnNext":"binderTurnPrev"} 0.38s ease-out` : "none"}}>
-      <div style={{background:"#fff",borderRadius:18,boxShadow:"0 12px 40px rgba(0,0,0,0.12)",border:"2px solid #e2e8f0",
-          width:pageWidthPx,height:pageBoxHeightPx,boxSizing:"border-box",
-          display:"flex",alignItems:"center",justifyContent:"center"}}>
-        <div style={{display:"grid",gridTemplateColumns:`repeat(${width}, ${pocketW}px)`,gridTemplateRows:`repeat(${height}, ${pocketH}px)`,gap:BINDER_GAP}}>
+      {page.name && <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.2rem",color:"#0f172a",textAlign:"center",width:"100%"}}>{page.name}</div>}
+      <div style={{fontSize:"0.72rem",color:"#94a3b8",fontFamily:"monospace"}}>id {page.id} · {width}×{height}</div>
+      <div style={{background:"#fff",borderRadius:18,boxShadow:"0 12px 40px rgba(0,0,0,0.12)",border:"2px solid #e2e8f0",padding:"1.75rem",width:pageWidth,boxSizing:"border-box"}}>
+        <div style={{display:"grid",gridTemplateColumns:`repeat(${width}, 1fr)`,gap:16}}>
           {cells.map((card,i)=>(
             <BinderPocket key={i} card={card} cardData={card?cardDataMap[card._id]:null}
-              userPhoto={card?(userPhotos[card._id]||null):null} onOpen={onOpenCard} hideGrayOut={hideGrayOut} hidePrices={hidePrices}/>
+              userPhoto={card?(userPhotos[card._id]||null):null} onOpen={onOpenCard} hideGrayOut={hideGrayOut}/>
           ))}
         </div>
       </div>
@@ -2196,63 +2115,38 @@ function BinderPage({ page, cards, cardDataMap, userPhotos, onOpenCard, hideGray
 }
 
 // ─── Binder View — full spread turner (page 1 alone, then pairs like an open book) ─
-function BinderView({ spread, spreadIdx, totalSpreads, animDir, cardsByPage, cardDataMap, userPhotos, onOpenCard, hideGrayOut, hidePrices, onPrev, onNext, modeButton }) {
+function BinderView({ spread, spreadIdx, totalSpreads, animDir, cardsByPage, cardDataMap, userPhotos, onOpenCard, hideGrayOut, onPrev, onNext }) {
   const pages = spread || [];
-  const geometry = useBinderPageGeometry();
-  const navCluster = (
-    <div style={{display:"flex",alignItems:"center",gap:14,flexShrink:0}}>
-      <button onClick={onPrev} disabled={spreadIdx<=0}
-        style={{...BINDER_NAV_BTN_STYLE,opacity:spreadIdx<=0?0.3:1,cursor:spreadIdx<=0?"default":"pointer"}}
-        aria-label="Previous page">‹</button>
-      <div style={{fontFamily:"'Syne',sans-serif",fontWeight:700,fontSize:"1.05rem",color:"#475569",whiteSpace:"nowrap"}}>
-        {totalSpreads>0 ? `${spreadIdx+1} / ${totalSpreads}` : ""}
-      </div>
-      <button onClick={onNext} disabled={spreadIdx>=totalSpreads-1}
-        style={{...BINDER_NAV_BTN_STYLE,opacity:spreadIdx>=totalSpreads-1?0.3:1,cursor:spreadIdx>=totalSpreads-1?"default":"pointer"}}
-        aria-label="Next page">›</button>
-    </div>
-  );
   return (
-    <div style={{position:"relative"}}>
-      {/* Mode-toggle button — positioned relative to this full-width wrapper (not the
-          max-width inner container below), exactly mirroring how the header positions it
-          (top:1rem, right:1.75rem from the viewport edge), so it lands in the same screen
-          spot and doesn't visibly jump when switching modes — including on very wide screens
-          where the max-width container is inset from the viewport edge. */}
-      {modeButton && (
-        <div style={{position:"absolute",top:"1rem",right:"1.75rem",zIndex:20}}>{modeButton}</div>
-      )}
-      <main style={{maxWidth:1700,margin:"0 auto",padding:"1.25rem 1.75rem 2rem",display:"flex",flexDirection:"column",alignItems:"center",gap:14}}>
-        {/* Title row mirrors the box row's exact gap/width per item, so titles stay centered
-            above their own page — the nav cluster floats over it (absolutely positioned) rather
-            than sitting inline, so it never pushes a title off-center. */}
-        <div style={{position:"relative",display:"flex",alignItems:"center",gap:32,justifyContent:"center",width:"100%",minHeight:44}}>
-          {pages.length===0 ? (
-            <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.1rem",color:"#0f172a"}}>Binder</div>
-          ) : pages.map((page)=>(
-            <div key={page.id} style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.2rem",color:"#0f172a",textAlign:"center",width:geometry.pageWidthPx}}>{page.name}</div>
-          ))}
-          {pages.length===2 && (
-            <div style={{position:"absolute",left:"50%",top:"50%",transform:"translate(-50%,-50%)"}}>{navCluster}</div>
-          )}
+    <main style={{maxWidth:1700,margin:"0 auto",padding:"2rem 1.75rem",display:"flex",flexDirection:"column",alignItems:"center",gap:20}}>
+      <div style={{display:"flex",alignItems:"center",gap:22}}>
+        <button onClick={onPrev} disabled={spreadIdx<=0}
+          style={{...BINDER_NAV_BTN_STYLE,opacity:spreadIdx<=0?0.3:1,cursor:spreadIdx<=0?"default":"pointer"}}
+          aria-label="Previous page">‹</button>
+        <div style={{textAlign:"center",minWidth:80}}>
+          <div style={{fontFamily:"'Syne',sans-serif",fontWeight:800,fontSize:"1.1rem",color:"#0f172a"}}>
+            {totalSpreads>0 ? `${spreadIdx+1} / ${totalSpreads}` : "Binder"}
+          </div>
         </div>
-        {pages.length!==2 && navCluster}
+        <button onClick={onNext} disabled={spreadIdx>=totalSpreads-1}
+          style={{...BINDER_NAV_BTN_STYLE,opacity:spreadIdx>=totalSpreads-1?0.3:1,cursor:spreadIdx>=totalSpreads-1?"default":"pointer"}}
+          aria-label="Next page">›</button>
+      </div>
 
-        {pages.length===0
-          ? <div style={{textAlign:"center",padding:"5rem 2rem",color:"#94a3b8"}}>
-              <div style={{fontSize:"0.95rem",fontFamily:"monospace",fontWeight:600}}>No binder pages configured yet.</div>
-              <div style={{fontSize:"0.8rem",fontFamily:"monospace",marginTop:6}}>Add entries to the BINDER_PAGES array to get started.</div>
-            </div>
-          : <div style={{display:"flex",gap:32,alignItems:"flex-start",justifyContent:"center",flexWrap:"wrap",width:"100%"}}>
-              {pages.map((page,i)=>(
-                <BinderPage key={page.id} page={page} cards={cardsByPage[page.id]||{}} geometry={geometry}
-                  cardDataMap={cardDataMap} userPhotos={userPhotos} onOpenCard={onOpenCard} hideGrayOut={hideGrayOut} hidePrices={hidePrices}
-                  side={pages.length<2 ? "single" : (i===0?"left":"right")} animDir={animDir}/>
-              ))}
-            </div>
-        }
-      </main>
-    </div>
+      {pages.length===0
+        ? <div style={{textAlign:"center",padding:"5rem 2rem",color:"#94a3b8"}}>
+            <div style={{fontSize:"0.95rem",fontFamily:"monospace",fontWeight:600}}>No binder pages configured yet.</div>
+            <div style={{fontSize:"0.8rem",fontFamily:"monospace",marginTop:6}}>Add entries to the BINDER_PAGES array to get started.</div>
+          </div>
+        : <div style={{display:"flex",gap:32,alignItems:"flex-start",justifyContent:"center",flexWrap:"wrap",width:"100%"}}>
+            {pages.map((page,i)=>(
+              <BinderPage key={page.id} page={page} cards={cardsByPage[page.id]||{}}
+                cardDataMap={cardDataMap} userPhotos={userPhotos} onOpenCard={onOpenCard} hideGrayOut={hideGrayOut}
+                side={pages.length<2 ? "single" : (i===0?"left":"right")} animDir={animDir}/>
+            ))}
+          </div>
+      }
+    </main>
   );
 }
 
@@ -2587,14 +2481,8 @@ function App() {
   const [selectedCard,setSelectedCard]= useState(null);
 
   // Binder View — flips the whole site into a virtual card-binder page turner.
-  const [binderMode, setBinderMode] = useState(()=>localStorage.getItem("scyther-binder-mode")==="1");
-  useEffect(()=>{localStorage.setItem("scyther-binder-mode",binderMode?"1":"0");},[binderMode]);
-  const [binderSpreadIdx, setBinderSpreadIdx] = useState(()=>{
-    const v = parseInt(localStorage.getItem("scyther-binder-spread-idx")||"0",10);
-    if (isNaN(v) || !BINDER_SPREADS.length) return 0;
-    return Math.max(0, Math.min(v, BINDER_SPREADS.length-1));
-  });
-  useEffect(()=>{localStorage.setItem("scyther-binder-spread-idx",String(binderSpreadIdx));},[binderSpreadIdx]);
+  const [binderMode, setBinderMode] = useState(false);
+  const [binderSpreadIdx, setBinderSpreadIdx] = useState(0);
   const [binderAnimDir, setBinderAnimDir] = useState(null); // 'next' | 'prev' | null — drives the page-turn animation
   const binderGoPrev = useCallback(()=>{ setBinderAnimDir("prev"); setBinderSpreadIdx(i=>Math.max(0,i-1)); },[]);
   const binderGoNext = useCallback(()=>{ setBinderAnimDir("next"); setBinderSpreadIdx(i=>Math.min(BINDER_SPREADS.length-1,i+1)); },[]);
@@ -2949,29 +2837,6 @@ function App() {
     </div>
   );
 
-  // View mode toggle — cycles: My Collection → Binder View → Personal Collection → …
-  // Extracted so it can render either in the header (collection/personal views) or
-  // inline in Binder View's own title row (which has no header bar at all).
-  const modeToggleButton = (
-    <button onClick={()=>{
-        if(!personalMode && !binderMode){ setBinderMode(true); }
-        else if(binderMode){ setBinderMode(false); setPersonalMode(true); }
-        else { setPersonalMode(false); }
-      }}
-      title={
-        (!personalMode && !binderMode) ? "My Collection — click to open Binder View" :
-        binderMode ? "Binder View — click to switch to Personal Collection (a blank checklist you can fill in — stored only in your browser)" :
-        "Personal Collection — click to return to My Collection"
-      }
-      style={{padding:"0.42rem 0.9rem",borderRadius:9,
-        border:`2px solid ${binderMode?"#7c3aed":personalMode?"#0891b2":"#e2e8f0"}`,
-        background:binderMode?"#f5f3ff":personalMode?"#ecfeff":"#f8fafc",
-        color:binderMode?"#6d28d9":personalMode?"#0e7490":"#475569",
-        fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
-      <span style={{fontSize:"1.2rem",lineHeight:1}}>{binderMode?"📖":personalMode?"📋":"⭐"}</span>
-    </button>
-  );
-
   return (
     <div style={{minHeight:"100vh",background:"#f1f5f9"}}>
       <style>{`
@@ -3029,8 +2894,7 @@ function App() {
         @keyframes photoSlideInLeft{from{transform:translateX(-40%);opacity:0}to{transform:translateX(0);opacity:1}}
       `}</style>
 
-      {/* ── HEADER — scrolls away (hidden entirely in Binder View, which has no header bar) ── */}
-      {!binderMode && (
+      {/* ── HEADER — scrolls away ── */}
       <header style={{background:"rgba(255,255,255,0.97)",borderBottom:"2px solid #e2e8f0",boxShadow:"0 2px 12px rgba(0,0,0,0.07)",position:"relative",zIndex:100}}>
           <div className="header-inner" style={{maxWidth:1700,margin:"0 auto",padding:"1rem 1.75rem",display:"flex",alignItems:"center",gap:"1rem"}}>
           {/* Logo icon — far left */}
@@ -3073,9 +2937,25 @@ function App() {
             </div>
             {/* ── Action buttons: Reorder + Categories + Resources ── */}
             <div className="header-right-btns" style={{display:"flex",flexDirection:"column",alignItems:"stretch",gap:6,position:"absolute",right:"1.75rem",top:"1rem"}}>
-              {/* View mode toggle */}
+              {/* View mode toggle — cycles: My Collection → Binder View → Personal Collection → … */}
               <div style={{position:"relative"}}>
-                {modeToggleButton}
+                <button onClick={()=>{
+                    if(!personalMode && !binderMode){ setBinderMode(true); }
+                    else if(binderMode){ setBinderMode(false); setPersonalMode(true); }
+                    else { setPersonalMode(false); }
+                  }}
+                  title={
+                    (!personalMode && !binderMode) ? "My Collection — click to open Binder View" :
+                    binderMode ? "Binder View — click to switch to Personal Collection (a blank checklist you can fill in — stored only in your browser)" :
+                    "Personal Collection — click to return to My Collection"
+                  }
+                  style={{padding:"0.42rem 0.9rem",borderRadius:9,
+                    border:`2px solid ${binderMode?"#7c3aed":personalMode?"#0891b2":"#e2e8f0"}`,
+                    background:binderMode?"#f5f3ff":personalMode?"#ecfeff":"#f8fafc",
+                    color:binderMode?"#6d28d9":personalMode?"#0e7490":"#475569",
+                    fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
+                  <span style={{fontSize:"1.2rem",lineHeight:1}}>{binderMode?"📖":personalMode?"📋":"⭐"}</span>
+                </button>
               </div>
               {/* Categories dropdown */}
               <div ref={categoryDropRef} style={{position:"relative",zIndex:60}}>
@@ -3176,7 +3056,6 @@ function App() {
                 )}
               </div>
               {/* Resources button + dropdown */}
-              {!binderMode && (
               <div ref={resourceDropRef} style={{position:"relative"}}>
                 <button onClick={()=>setResourceDropOpen(v=>!v)}
                   style={{padding:"0.42rem 0.9rem",borderRadius:9,fontFamily:"monospace",cursor:"pointer",transition:"all 0.18s",border:`2px solid ${resourceDropOpen?"#0891b2":"#e2e8f0"}`,background:resourceDropOpen?"#ecfeff":"#f8fafc",color:resourceDropOpen?"#0e7490":"#475569",display:"flex",flexDirection:"column",alignItems:"center",justifyContent:"center",gap:2}}>
@@ -3214,14 +3093,12 @@ function App() {
                   );
                 })()}
               </div>
-              )}
             </div>
           </div>
           </div>
           </div>
 
       </header>
-      )}
 
       {binderMode ? (
         <BinderView
@@ -3234,10 +3111,8 @@ function App() {
           userPhotos={userPhotos}
           onOpenCard={setSelectedCard}
           hideGrayOut={hideGrayOut}
-          hidePrices={hidePrices}
           onPrev={binderGoPrev}
           onNext={binderGoNext}
-          modeButton={modeToggleButton}
         />
       ) : (
       <React.Fragment>
@@ -3418,8 +3293,8 @@ function App() {
 
           </div>{/* end filter controls */}
 
-          {/* Checkboxes — right side (collection view only, and only when running locally) */}
-          {(IS_LOCAL&&!personalMode)&&(
+          {/* Checkboxes — right side (shown when running locally or in Personal Collection mode) */}
+          {(IS_LOCAL||personalMode)&&(
           <div className="filter-checkboxes" style={{display:"flex",flexDirection:"column",gap:6,alignItems:"flex-start",flexShrink:0}}>
             <label style={{display:"flex",alignItems:"center",gap:5,cursor:"pointer",fontSize:"0.75rem",fontFamily:"monospace",fontWeight:700,color:hideGrayOut?"#0f172a":"#94a3b8",userSelect:"none"}}>
               <input type="checkbox" checked={hideGrayOut} onChange={e=>setHideGrayOut(e.target.checked)} style={{width:14,height:14,cursor:"pointer",accentColor:"#0891b2"}}/>
