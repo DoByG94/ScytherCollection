@@ -3062,12 +3062,20 @@ function App() {
 
   const illustrationCounts = useMemo(()=>{
     const m={};
-    for(const c of baseCards){
+    for(const c of categoryFilteredBase){
       const ill=c.illustration||"";
       if(ill) m[ill]=(m[ill]||0)+1;
     }
     return m;
-  },[baseCards]);
+  },[categoryFilteredBase]);
+
+  // If the selected illustration filter is no longer among the visible ones (e.g. its
+  // category got hidden), fall back to "All" so the dropdown never sits on a hidden option.
+  useEffect(()=>{
+    if(filterIllustration!=="All"&&filterIllustration!=="none"&&!(illustrationCounts[filterIllustration]>0)){
+      setFilterIllustration("All");
+    }
+  },[illustrationCounts,filterIllustration]);
 
   // Vertical separator between filter groups
   const SEP = () => (
@@ -3537,7 +3545,7 @@ function App() {
               color:filterIllustration==="All"?"#94a3b8":"#0f172a",fontSize:"0.75rem",cursor:"pointer",fontWeight:filterIllustration==="All"?500:700,maxWidth:170}}>
             <option value="All">Illustration: All</option>
             <option value="none">No Illustration</option>
-            {Object.entries(ILLUSTRATIONS).map(([k,v])=><option key={k} value={k}>{v}{illustrationCounts[k]?` [${illustrationCounts[k]}]`:""}</option>)}
+            {Object.entries(ILLUSTRATIONS).filter(([k])=>illustrationCounts[k]>0).map(([k,v])=><option key={k} value={k}>{v} [{illustrationCounts[k]}]</option>)}
           </select>
 
           <SEP/>
